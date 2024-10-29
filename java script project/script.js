@@ -22,7 +22,7 @@ const temp = document.getElementById("temp"),
     weekBtn = document.querySelector(".week"),
     tempUnit = document.querySelectorAll(".temp-unit"),
     searchForm = document.querySelector("#search"),
-    search = document.querySelector("#query"),
+    search = document.querySelector("#query");
    
 let currentCity = "";
 let currentUnit = "c";
@@ -43,7 +43,7 @@ function getDateTime() {
         "Wednesday",
         "Thursday",
         "Friday",
-        "saturday",
+        "Saturday",
     ];
     //12 hour format
     hour = hour % 12;
@@ -84,7 +84,7 @@ getPublicIp();
 function getWeatherData (city, unit, hourlyorWeek) {
     // const apiKey = "EJ6UBL2JEQGYB3AA4ENASN62J";
     fetch(
-        `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/$%7Bcity%7D?unitGroup=metric&key=EJ6UBL2JEQGYB3AA4ENASN62J&contentType=json`,
+       `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${city}?unitGroup=metric&key=EJ6UBL2JEQGYB3AA4ENASN62J&contentType=json`,
         {
             method: "GET",
         }
@@ -203,19 +203,25 @@ function convertTimeTo12HourFormat(time) {
     return strTime; 
 }
 function getIcon(condition) {
-    if (condition == "Partly-cloudy-day") {
-        return "https://i.ibb.co/PZQXH8V/27.png";
-    } else if(condition == "Partly-cloudy-night"){
-        return "https://i.ibb.co/Kzkk59k/15.png";
-    } else if(condition == "Rain"){
-        return "https://i.ibb.co/kBd2NTS/39.png";
-    } else if(condition == "Clear-day"){
-        return "https://i.ibb.co/rb4rrJL/26.png";
-    } else if(condition == "Clear-night"){
-        return "https://i.ibb.co/1nxNGHL/10.png";
-    } 
+    switch (condition) {
+        case "partly-cloudy-day":
+            return "https://i.ibb.co/PZQXH8V/27.png";
+        case "partly-cloudy-night":
+            return "https://i.ibb.co/Kzkk59k/15.png";
+        case "rain":
+            return "https://i.ibb.co/kBd2NTS/39.png";
+        case "clear-day":
+            return "https://i.ibb.co/rb4rrJL/26.png";
+        case "clear-night":
+            return "https://i.ibb.co/1nxNGHL/10.png";
+        default:
+            return "https://i.ibb.co/1nxNGHL/10.png"; // Default icon if condition is unknown
+    }
 }
+
 function getDayName(date) {
+
+
     let day = new Date(date);
     let days = [
         "Sunday",
@@ -224,20 +230,26 @@ function getDayName(date) {
         "Wednesday",
         "Thursday",
         "Friday",
-        "saturday",
+        "saturday"
     ];
     return days[day.getDay()];
 }
 
-function getHour (time) {
-    let hour = time.split(":")[0];
-    let min = time.split(":")[1];
-    if (hour > 12) {
-        hour = hour -12;
-        return `${hour}:${min} PM`
-    } else {
-        return `${hour}:${min} AM`
-    }
+// function getHour (time) {
+//     let hour = time.split(":")[0];
+//     let min = time.split(":")[1];
+//     if (hour > 12) {
+//         hour = hour -12;
+//         return `${hour}:${min} PM`
+//     } else {
+//         return `${hour}:${min} AM`
+//     }
+// }
+function getHour(time) {
+    let[hour,minute] = time.split(":");
+    let ampm = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12|| 12;
+    return `${hour}:${minute} ${ampm}`;
 }
 
 function updateForecast (data , unit , type) {
@@ -255,12 +267,12 @@ function updateForecast (data , unit , type) {
         let card = document.createElement("div");
         card.classList.add("card");
         // hour if hourly time and day name if weekly
-        let datName = getHour(data[day].datetime); 
+        let dayName = getHour(data[day].datetime); 
         if(type == "week") {
             dayName =getDayName(data[day].datetime);
         }
         let dayTemp = data[day].temp;
-        if(unit == "f") {
+        if(unit == "F") {
             dayTemp = celciusToFahrenheit(data[day].temp);
             }
             let iconCondition = data[day].icon;
@@ -289,20 +301,28 @@ function updateForecast (data , unit , type) {
 function changeBackground(condition) {
     const body = document.querySelector("body");
     let bg = "";
-    if (condition == "Partly-cloudy-day") {
-        bg = "https://i.ibb.co/qNv7NxZ/pc.webp";
-    } else if(condition == "Partly-cloudy-night"){
-        bg =  "https://i.ibb.co/RDfPqXz/pcn.jpg";
-    } else if(condition == "Rain"){
-        bg = "https://i.ibb.co/h2p6Yhd/rain.webp";
-    } else if(condition == "Clear-day"){
-        bg = "https://i.ibb.co/WGry01m/cd.jpg";
-    } else if(condition == "Clear-night"){
-        bg = "https://i.ibb.co/kqtZ1Gx/cn.jpg";
-    } 
+    switch (condition) {
+        case "partly-cloudy-day":
+            bg = "https://i.ibb.co/qNv7NxZ/pc.webp";
+            break;
+        case "partly-cloudy-night":
+            bg = "https://i.ibb.co/RDfPqXz/pcn.jpg";
+            break;
+        case "rain":
+            bg = "https://i.ibb.co/h2p6Yhd/rain.webp";
+            break;
+        case "clear-day":
+            bg = "https://i.ibb.co/WGry01m/cd.jpg";
+            break;
+        case "clear-night":
+            bg = "https://i.ibb.co/kqtZ1Gx/cn.jpg";
+            break;
+        default:
+            bg = "https://i.ibb.co/kqtZ1Gx/cn.jpg"; // Default background if condition is unknown
+            break;
+    }
     body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${bg})`;
 }
-
 fahrenheitBtn.addEventListener("click", () => {
     changeUnit("f");
 })
@@ -359,5 +379,134 @@ searchForm.addEventListener("submit", (e) => {
     let location = search.value;
     if (location) {
         currentCity = location;
+        getWeatherData(currentCity, currentUnit, hourlyorWeek);
     }
 })
+
+//lets create a cities array which we want to suggest or we can use any api for this.
+
+cities = [
+    "Banglore",
+    "Abbottabad",
+    "Lahore",
+    "Guntur",
+    "Madhurai",
+    "Goa",
+    "Delhi",
+    "mumbai",
+    "Hydrabad",
+    "Vishakapatnam",
+];
+
+var currentFocus;
+// adding eventlistner on search
+search.addEventListener("input", function(e) {
+    removeSuggestions();
+    var
+     a, 
+     b,
+     i,
+     val=this.value;
+     //if there is nothing search input do nothing
+    if(!val) {
+        return false;
+    }
+    currentFocus = -1;
+
+    a = document.createElement("ul");
+    a.setAttribute("id","suggestions");
+//append the ul to its parent which is search form
+    this.parentNode.appendChild(a);
+
+
+    //adding li's with matching search suggestions
+
+    for (i = 0; i < cities.length; i++) {
+        //check items starts with same letters 
+
+        if(cities[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+            // if any suggestions matching
+            b = document.createElement("li");
+            // adding content in li
+            //strong to make the matching letters bold
+            b.innerHTML="<strong>" + cities[i].substr(0,val.length)+ "</strong>"
+            // remaining par of suggestions
+            b.innerHTML += cities[i].substr(val.length);
+            //input field to hold the suggestions value
+            b.innerHTML += "<input type= 'hidden' value='" + cities[i] + "'>"; 
+            //add event listener on suggestion
+            b.addEventListener("click", function (e) {
+            //on click set the search input with clicked suggestion value
+            search.value = this.getElementByTagName("input")[0].value;
+            removeSuggestions();
+            });
+
+
+            //append suggestions li to ul
+            a.appendChild(b);
+            
+        }
+    }
+});
+
+//its working but every new suggestion is coming over prev
+//lets remove prev suggestion then add new ones
+
+function removeSuggestions() {
+    //select the ul which is being adding on search input
+    var x = document.getElementById("suggestions");
+    //if x exists remove it
+    if (x) x.parentNode.removeChild(x);
+}
+
+//lets add up and down keys functionality to select a suggestion ul
+
+search.addEventListener("keydown", function (e) {
+    var x = document.getElementById("suggestions");
+    //select the li elements of suggestion ul
+    if (x) x = document.getElementsByTagName("li");
+
+    if (e.keyCode == 40) {
+        //if key code is down button
+        currentFocus++;
+        //lets create a function to add active suggestions
+        addActive(x);
+    } else if (e.keyCode == 38) {
+        //if code is up button 
+        currentFocus--;
+        addActive(x);
+    }
+    if(e.keyCode == 13){
+        // if enter is pressed add the current suggestion
+
+        e.preventDefault();
+        if (currentFocus > -1) {
+            // if any suggestions is selected click it
+            if (x) x[currentFocus].click();
+        }
+    }
+});
+function addActive(x) {
+    //if there is no suggestion return as it is
+
+    if(!x) return false;
+    removeActive(x);
+    //if current focus is more than length of suggestion array make it 0
+
+    if (currentFocus >! x.length) currentFocus = 0;
+    // if it is less than 0 make suggestion equals
+    if (currentFocus < 0) currentFocus = x.length -1;
+
+    //adding active class on focused li
+    x[currentFocus].classList.add("active");
+
+    
+}
+
+// its working but we need to remove previously active suggestion
+
+function removeActive(x) {
+    for (var i = 0; i < x.length; i++) {
+        x[i].classList.remove("active");
+    }
+}
