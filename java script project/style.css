@@ -15,7 +15,7 @@ body {
     padding: 50px;
     background: var(--primary-clr);
     transition: background-image 0.3s ease;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.5),rgba(0, 0, 0, 0.5)), url();
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5),rgba(0, 0, 0, 0.5)), url("https://i.ibb.co/WGry01m/cd.jpg");
     background-size: cover;
     background-position: center;
 }
@@ -142,7 +142,7 @@ img {
     align-items: center;
     font-size: 14px;
     gap: 10px;
-    margin-top: 10px;
+    margin-top: 340px;
 }
 .main {
     width: 100%;
