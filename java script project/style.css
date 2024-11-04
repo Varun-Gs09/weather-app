@@ -137,13 +137,15 @@ img {
 .condition-rain div i{
     width: 20px;
 }
-#location{
+#location {
+    margin-top: auto;
     display: flex;
     align-items: center;
     font-size: 14px;
     gap: 10px;
-    margin-top: 340px;
+    margin-top: 640px;     /* Optional spacing */
 }
+
 .main {
     width: 100%;
     min-width: 400px;
