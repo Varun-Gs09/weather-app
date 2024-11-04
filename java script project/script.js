@@ -65,30 +65,64 @@ setInterval(()=>{
 }, 1000);
 
 //function to get public ip with fetch
+// let currentCity = "Bangalore"; // Default city to Bangalore
+// let currentUnit = "c";
+// let hourlyorWeek = "Week";
 
+// Set default location display on page load
+currentLocation.innerText = currentCity;
+
+// Function to get the public IP-based location
 function getPublicIp() {
-    fetch("https://geolocation-db.com/json/" ,{
-        method:"GET",
+    fetch("https://geolocation-db.com/json/", {
+        method: "GET",
     })
-    .then((response)=>response.json())
-        .then((data)=> {
-            console.log(data);
+    .then((response) => response.json())
+    .then((data) => {
+        if (data && data.city) {
             currentCity = data.city;
-            getWeatherData(data.city , currentUnit , hourlyorWeek);
-        });
+            currentLocation.innerText = data.city;
+        } else {
+            currentCity = "Bangalore"; // Fallback to Bangalore if city not found
+            currentLocation.innerText = "Bangalore (default)";
+        }
+        getWeatherData(currentCity, currentUnit, hourlyorWeek);
+    })
+    .catch((error) => {
+        console.error("Error fetching IP-based location:", error);
+        currentCity = "Bangalore"; // Fallback to Bangalore on error
+        currentLocation.innerText = "Bangalore (default)";
+        getWeatherData(currentCity, currentUnit, hourlyorWeek);
+    });
 }
+
+// Call getPublicIp to initialize the location on page load
 getPublicIp();
+
+
+// function getPublicIp() {
+//     fetch("https://geolocation-db.com/json/" ,{
+//         method:"GET",
+//     })
+//     .then((response)=>response.json())
+//         .then((data)=> {
+//             console.log(data);
+//             currentCity = data.city;
+//             currentLocation.innerText = data.city;
+//             getWeatherData(data.city , currentUnit , hourlyorWeek);
+//         });
+// }
+// getPublicIp();
 
 //function to get weather data
 
 function getWeatherData (city, unit, hourlyorWeek) {
-    // const apiKey = "EJ6UBL2JEQGYB3AA4ENASN62J";
+   
     fetch(
-       `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${city}?unitGroup=metric&key=EJ6UBL2JEQGYB3AA4ENASN62J&contentType=json`,
-        {
-            method: "GET",
-        }
-        )
+        `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${city}?unitGroup=metric&key=EJ6UBL2JEQGYB3AA4ENASN62J&contentType=json`,
+        { method: "GET" }
+    )
+    
             .then((response) => response.json())
             .then((data) =>{
                 let today = data.currentConditions;
@@ -178,17 +212,17 @@ function updateVisibilityStatus(visibility) {
 
 function updateAirQualityStatus(airQuality) {
     if(airQuality <= 50) {
-        airQualityStatus.innerText = "Good";
+        airQualityStatus.innerText = "Good👌";
     } else if(airQuality <= 100) {
-        airQualityStatus.innerText = "Moderate";
+        airQualityStatus.innerText = "Moderate😳";
     } else if(airQuality <= 150) {
-        airQualityStatus.innerText = "Unhealthy for Sensitive Groups";
+        airQualityStatus.innerText = "Unhealthy for Sensitive Groups😷";
     } else if(airQuality <= 200) {
-        airQualityStatus.innerText = "Unhealthy";
+        airQualityStatus.innerText = "Unhealthy😷";
     } else if(airQuality <= 250) {
-        airQualityStatus.innerText = "Very Unhealthy";
+        airQualityStatus.innerText = "Very Unhealthy😨";
     } else {
-        airQualityStatus.innerText = "Hazardous";
+        airQualityStatus.innerText = "Hazardous😱";
     }
 }
 function convertTimeTo12HourFormat(time) {
@@ -234,23 +268,23 @@ function getDayName(date) {
     ];
     return days[day.getDay()];
 }
-
-// function getHour (time) {
-//     let hour = time.split(":")[0];
-//     let min = time.split(":")[1];
-//     if (hour > 12) {
-//         hour = hour -12;
-//         return `${hour}:${min} PM`
-//     } else {
-//         return `${hour}:${min} AM`
-//     }
-// }
 function getHour(time) {
-    let[hour,minute] = time.split(":");
-    let ampm = hour >= 12 ? "PM" : "AM";
-    hour = hour % 12|| 12;
-    return `${hour}:${minute} ${ampm}`;
+    let hour = time.split(":")[0];
+    let min = time.split(":")[1];
+    if (hour>12){
+        hour = hour-12;
+        return`${hour}:${min}PM`;
+    } else{
+        return `${hour}:${min}AM`;
+    }
 }
+
+// function getHour(time) {
+//     let[hour,minute] = time.split(":");
+//     let ampm = hour >= 12 ? "PM" : "AM";
+//     hour = hour % 12|| 12;
+//     return `${hour}:${minute} ${ampm}`;
+// }
 
 function updateForecast (data , unit , type) {
     weatherCards.innerHTML = "";
@@ -272,7 +306,7 @@ function updateForecast (data , unit , type) {
             dayName =getDayName(data[day].datetime);
         }
         let dayTemp = data[day].temp;
-        if(unit == "F") {
+        if(unit == "f") {
             dayTemp = celciusToFahrenheit(data[day].temp);
             }
             let iconCondition = data[day].icon;
@@ -336,7 +370,7 @@ function changeUnit(unit) {
          {
             //change unit on document
             tempUnit.forEach((elem) => {
-                elem.innerText = `${unit.toUpperCase()}`;
+                elem.innerText = "°"+`${unit.toUpperCase()}`;
             });
             if (unit == "c") {
                 celciusBtn.classList.add("active")
@@ -390,7 +424,7 @@ cities = [
     "Abbottabad",
     "Lahore",
     "Guntur",
-    "Madhurai",
+    "Madurai",
     "Goa",
     "Delhi",
     "mumbai",
@@ -437,7 +471,7 @@ search.addEventListener("input", function(e) {
             //add event listener on suggestion
             b.addEventListener("click", function (e) {
             //on click set the search input with clicked suggestion value
-            search.value = this.getElementByTagName("input")[0].value;
+            search.value = this.getElementsByTagName("input")[0].value;
             removeSuggestions();
             });
 
